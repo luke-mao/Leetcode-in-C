@@ -55,17 +55,18 @@ int SearchDict(Dict d, int value, int target);
 
 int* twoSum(int* nums, int numsSize, int target, int* returnSize);
 
+void printDict(Dict d);
 
 
 // 
 int main (void){
     int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int target = 8;
+    int target = 19;
     int returnSize = 2; // I think this is irrelevant
 
     int* answer = twoSum(a, 10, target, &returnSize);
 
-    printf("The answer is %d %d", answer[0], answer[1]);
+    printf("The answer is %d %d\n", answer[0], answer[1]);
     
     free(answer);
 
@@ -85,6 +86,8 @@ int* twoSum(int* nums, int numsSize, int target, int* returnSize){
     Dict d = CreateDict(DICT_INITIAL_SIZE);
 
     for (int i = 0; i < numsSize; i++){
+        printf("New run: number = %d, target = %d, look for value %d\n", nums[i], target, target-nums[i]);
+
         int i2 = SearchDict(d, nums[i], target);
 
         if (i2 == -1){
@@ -92,12 +95,23 @@ int* twoSum(int* nums, int numsSize, int target, int* returnSize){
             InsertIntoDict(i, nums[i], target, d);
         }
         else{
-            // find, return the two indexes in any order
-            result[0] = i; 
-            result[1] = i2;
+            if (i < i2){
+                result[0] = i; 
+                result[1] = i2;
+            }
+            else{
+                result[0] = i2; 
+                result[1] = i;
+            }
+
             break;
         }
+
+        // printDict(d);
     }
+
+    // free the dictionary
+    DestroyDict(d);
 
     return result;
 }
@@ -125,7 +139,7 @@ Node DestroyNode(Node n){
 }
 
 
-// start size = 10
+
 DictNode CreateDictNode(int size){
     assert(size > 0);
 
@@ -134,6 +148,7 @@ DictNode CreateDictNode(int size){
 
     dn->top = 0;
     dn->size = size;
+
     dn->list = (Node*) malloc(dn->size * sizeof(Node));
     assert(dn->list != NULL);
 
@@ -186,7 +201,9 @@ Dict DestroyDict(Dict d){
     assert(d != NULL);
     
     for (int i = 0; i < d->size; i++){
-        d->list[i] = DestroyDictNode(d->list[i]);
+        if (d->list[i] != NULL){
+            d->list[i] = DestroyDictNode(d->list[i]);
+        }
     }
 
     free(d->list);
@@ -242,7 +259,7 @@ void InsertIntoDict(int index, int value, int target, Dict d){
 
 
 int SearchDictNode(DictNode dn, int value, int target){
-    assert(dn != NULL);
+    assert(dn != NULL && dn->list != NULL);
 
     int result_index = -1;
 
@@ -261,7 +278,7 @@ int SearchDictNode(DictNode dn, int value, int target){
 int SearchDict(Dict d, int value, int target){
     assert(d != NULL);
 
-    int key = (target - value) % d->size;
+    int key = value % d->size;
 
     if (d->list[key] == NULL){
         return -1;
@@ -272,7 +289,31 @@ int SearchDict(Dict d, int value, int target){
 }
 
 
+void printDict(Dict d){
+    assert(d != NULL && d->list != NULL);
 
+    printf("----Print dictionary (only print nodes that are occupied)----\n");
+    printf("Dictionary Size = %d\n", d->size);
+
+    for (int i = 0; i < d->size; i++){
+        if (d->list[i] != NULL){
+            printf("Key = %d: ", i);
+
+            DictNode dn = d->list[i];
+            assert(dn->list != NULL);
+
+            for (int j = 0; j < dn->top; j++){
+                printf("(index=%d, value=%d) ", dn->list[j]->index, dn->list[j]->value);
+            }
+
+            printf("\n");
+        }
+    }
+
+    printf("----End dictionary print---\n\n");
+
+    return;
+}
 
 
 
