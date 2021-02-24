@@ -8,8 +8,6 @@ const int DICTNODE_INITIAL_SIZE = 10;
 
 
 // define all structures and functions
-
-
 // we need to create a dictionary
 // dictionary[value] = the index of this value
 // better to have a node, the node contains both index and the value
@@ -60,9 +58,16 @@ void printDict(Dict d);
 
 // 
 int main (void){
-    int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
-    int target = 19;
-    int returnSize = 2; // I think this is irrelevant
+    // int a[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    // int target = 19;
+
+    // int a[4] = {0, 4, 3, 0};
+    // int target = 0;
+
+    int a[4] = {-3, 4, 3, 90};
+    int target = 0;
+
+    int returnSize;     // this needs to define as 2 in the function twoSum
 
     int* answer = twoSum(a, 10, target, &returnSize);
 
@@ -79,7 +84,9 @@ int main (void){
 
 int* twoSum(int* nums, int numsSize, int target, int* returnSize){
     // returnSize = 2
-    int* result = (int*) malloc(*returnSize * sizeof(int));
+    *returnSize = 2;
+
+    int* result = (int*) malloc((*returnSize) * sizeof(int));
     assert(result != NULL);
 
     // create the dictionary
@@ -248,9 +255,15 @@ void InsertIntoDict(int index, int value, int target, Dict d){
 
     int key = (target - value ) % d->size;
 
+    if (key < 0){
+        key += d->size;
+    }
+
+
     if (d->list[key] == NULL){
         d->list[key] = CreateDictNode(DICTNODE_INITIAL_SIZE);
     }
+
 
     InsertIntoDictNode(d->list[key], n);
 
@@ -279,6 +292,10 @@ int SearchDict(Dict d, int value, int target){
     assert(d != NULL);
 
     int key = value % d->size;
+    
+    if (key < 0){
+        key += d->size;
+    }
 
     if (d->list[key] == NULL){
         return -1;
